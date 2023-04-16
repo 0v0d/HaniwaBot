@@ -20,4 +20,4 @@ class MyCog(commands.Cog):
 
     @commands.command()
     async def bard(self, ctx):
-        await ctx.send('tweet')
+        await ctx.send('twee')
