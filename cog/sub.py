@@ -17,3 +17,7 @@ class MyCog(commands.Cog):
     @commands.command()
     async def cat(self, ctx):
         await ctx.send('にゃん！')
+
+    @commands.command()
+    async def bard(self, ctx):
+        await ctx.send('twee')
