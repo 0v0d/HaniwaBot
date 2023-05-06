@@ -26,7 +26,6 @@ async def on_ready():
     await client.add_cog(Random(client))
     print(client.user.name)  # Botの名前
     print(client.user.id)  # ID
-    print(discord.__version__)
     await client.change_presence(activity=discord.Game(name=f"{len(client.guilds)}サーバー"))
 
 
