@@ -1,11 +1,8 @@
 import discord
 import os
-from dotenv import load_dotenv
 from discord.ext import commands
 from keep_alive import keep_alive
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-load_dotenv(dotenv_path)
 from cog.Calculation import Calculator
 from cog.sub import MyCog
 from cog.Random import Random
@@ -13,7 +10,7 @@ from cog.Random import Random
 intents = discord.Intents.default()
 intents.message_content = True
 client = commands.Bot(
-  command_prefix=commands.when_mentioned_or("h"),
+  command_prefix=commands.when_mentioned_or("!"),
   intents=intents,
   case_insensitive=True,
   help_command=None,
@@ -33,7 +30,4 @@ async def on_ready():
 
 
 keep_alive()
-try:
-  client.run(os.environ.get("DISCORD_BOT_TOKEN"))
-except:
-  os.system("kill 1")
+client.run(os.environ["DISCORD_BOT_TOKEN"])
