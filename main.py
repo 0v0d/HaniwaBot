@@ -21,18 +21,13 @@ async def on_ready():
     await client.change_presence(activity=discord.Game(name="im sleepy"))
     await tree.sync()
 
-keep_alive()
+
 load_dotenv()
 
-commands = [
-    RandomGenerator(),
-    DecorateText(),
-    Calculator(),
-    Weather()
-]
+commands = [RandomGenerator(), DecorateText(), Calculator(), Weather()]
 
 for command in commands:
     tree.add_command(command)
 
+keep_alive()
 client.run(os.getenv("DISCORD_BOT_TOKEN"))
-
