@@ -2,83 +2,96 @@ import discord
 from discord import app_commands
 import aiohttp
 
+from model.LocationMap import location_map
+
 url: str = "https://www.jma.go.jp/bosai/forecast/data/forecast/"
 json: str = '.json'
-location_map = {
-    "北海道": "016000",
-    "青森": "020000",
-    "岩手": "030000",
-    "宮城": "040000",
-    "秋田": "050000",
-    "山形": "060000",
-    "福島": "070000",
-    "茨城": "080000",
-    "栃木": "090000",
-    "群馬": "100000",
-    "埼玉": "110000",
-    "千葉": "120000",
-    "東京": "130000",
-    "神奈川": "140000",
-    "新潟": "150000",
-    "富山": "160000",
-    "石川": "170000",
-    "福井": "180000",
-    "山梨": "190000",
-    "長野": "200000",
-    "岐阜": "210000",
-    "静岡": "220000",
-    "愛知": "230000",
-    "三重": "240000",
-    "滋賀": "250000",
-    "京都": "260000",
-    "大阪": "270000",
-    "兵庫": "280000",
-    "奈良": "290000",
-    "和歌山": "300000",
-    "鳥取": "310000",
-    "島根": "320000",
-    "岡山": "330000",
-    "広島": "340000",
-    "山口": "350000",
-    "徳島": "360000",
-    "香川": "370000",
-    "愛媛": "380000",
-    "高知": "390000",
-    "福岡": "400000",
-    "佐賀": "410000",
-    "長崎": "420000",
-    "熊本": "430000",
-    "大分": "440000",
-    "宮崎": "450000",
-    "鹿児島": "460100",
-    "沖縄": "471000",
-}
+
+
+async def weather_forecast(interaction: discord.Interaction, region: str, location: str):
+    await interaction.response.defer()
+    try:
+        location_code = location_map[region].get(location)
+        if not location_code:
+            await interaction.followup.send(f'エラー: {location} の地域コードが見つかりません。', ephemeral=True)
+            return
+
+        weather_data = await get_weather(location_code)
+        if weather_data:
+            embed = create_weather_embed(location, weather_data)
+            await interaction.followup.send(embed=embed)
+        else:
+            await interaction.followup.send('天気情報を取得できませんでした。', ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f'エラーが発生しました: {str(e)}', ephemeral=True)
 
 
 class Weather(app_commands.Group):
     def __init__(self):
         super().__init__(name="weather", description="天気情報コマンド")
 
-    @app_commands.command(name="forecast", description="明日の天気予報を表示")
-    @app_commands.choices(location=[
-        app_commands.Choice(name=key, value=key) for key in location_map.keys()
+    @app_commands.command(name="hokkaido", description="北海道の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["北海道"].keys()
     ])
-    async def weather_forecast(self, interaction: discord.Interaction, location: str):
-        await interaction.response.defer()
-        try:
-            location_code = location_map.get(location)
-            if not location_code:
-                await interaction.followup.send(f'エラー: {location} の地域コードが見つかりません。', ephemeral=True)
-                return
+    async def weather_forecast_hokkaido(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "北海道", loc)
 
-            weather_data = await get_weather(location_code)
-            if weather_data:
-                embed = create_weather_embed(location, weather_data)
-                await interaction.followup.send(embed=embed)
-            else:
-                await interaction.followup.send('天気情報を取得できませんでした。', ephemeral=True)
-        except Exception as e:
-            await interaction.followup.send(f'エラーが発生しました: {str(e)}', ephemeral=True)
+    @app_commands.command(name="tohoku", description="東北地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["東北"].keys()
+    ])
+    async def weather_forecast_tohoku(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "東北", loc)
+
+    @app_commands.command(name="kanto", description="関東地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["関東"].keys()
+    ])
+    async def weather_forecast_kanto(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "関東", loc)
+
+    @app_commands.command(name="chubu", description="中部地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["中部"].keys()
+    ])
+    async def weather_forecast_chubu(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "中部", loc)
+
+    @app_commands.command(name="kinki", description="近畿地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["近畿"].keys()
+    ])
+    async def weather_forecast_kinki(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "近畿", loc)
+
+    @app_commands.command(name="chugoku", description="中国地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["中国"].keys()
+    ])
+    async def weather_forecast_chugoku(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "中国", loc)
+
+    @app_commands.command(name="shikoku", description="四国地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["四国"].keys()
+    ])
+    async def weather_forecast_shikoku(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "四国", loc)
+
+    @app_commands.command(name="kyushu", description="九州地方の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["九州"].keys()
+    ])
+    async def weather_forecast_kyushu(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "九州", loc)
+
+    @app_commands.command(name="okinawa", description="沖縄の明日の天気予報を表示")
+    @app_commands.choices(loc=[
+        app_commands.Choice(name=key, value=key) for key in location_map["沖縄"].keys()
+    ])
+    async def weather_forecast_okinawa(self, interaction: discord.Interaction, loc: str):
+        await weather_forecast(interaction, "沖縄", loc)
 
 
 async def get_weather(location_code: str):
