@@ -4,6 +4,7 @@
 HaniwaBotは、Pythonで作成されたDiscordBotです。スラッシュコマンドをサポートし、計算やランダム選択、天気予報などの機能を提供します。
 
 ## コマンド一覧
+
 ### 計算コマンド
 - **/calc add**: 2項の加算
 - **/calc sub**: 2項の減算
@@ -21,7 +22,6 @@ HaniwaBotは、Pythonで作成されたDiscordBotです。スラッシュコマ�
 ### 天気予報コマンド
 - **/weather forecast**: 気象庁のAPIを使用して、3日間の天気予報を表示
 
----
 ## インストール
 
 ### 1. リポジトリをクローン
@@ -66,9 +66,66 @@ pip install -r requirements.txt
 ### 1. `.env`ファイルを作成
 リポジトリのルートディレクトリに`.env`ファイルを作成し、以下の内容を追加します:
 ```env
-DISCORD_TOKEN=あなたのディスコードボットトークン
+DISCORD_TOKEN=あなたのディスコードトークン
 ```
 ※「あなたのディスコードトークン」は、先ほどコピーしたBotトークンを入力してください。
+
+## デプロイ
+
+HaniwaBotを常時起動するためには、[Render.com](https://render.com/)を使用することをおすすめします。以下の手順でデプロイしてください。
+
+### Render.comを使用してデプロイ
+1. [Render.com](https://render.com/)にアクセスし、アカウントを作成します。
+2. 「New +」をクリックし、「Web Service」を選択します。
+3. GitHubリポジトリを連携し、HaniwaBotのリポジトリを選択します。
+4. ビルドコマンドと起動コマンドを設定します。
+    - ビルドコマンド: `pip install -r requirements.txt`
+    - 起動コマンド: `python bot.py`
+
+詳しいデプロイ手順は[こちらのQiita記事](https://qiita.com/Erytheia/items/2f64c06d6d8a4f802390)を参照してください。
+
+### サーバーを常時起動する方法
+
+#### UptimeRobotを使用する場合
+[UptimeRobot](https://uptimerobot.com/)を使用して、定期的にPingを送信し、サーバーを常時起動状態に保ちます。UptimeRobotに登録し、新しいHTTPモニターを設定します。Render.comのURLを入力し、監視間隔を設定します。
+
+#### Google Apps Scriptを使用する場合
+Google Apps Scriptを使用して、サーバーを定期的に起動することもできます。以下のスクリプトを使用します:
+
+```js
+const SCRIPT_URL = PropertiesService.getScriptProperties().getProperty('renderURL');
+
+function wake() {
+  const jsonPayload = createWakePayload();
+  send(SCRIPT_URL, jsonPayload);
+}
+
+function createWakePayload() {
+  return {
+    type: 'wake'
+  };
+}
+
+function send(uri, json) {
+  const params = createRequestParams(json);
+  const response = UrlFetchApp.fetch(uri, params);
+}
+
+function createRequestParams(json) {
+  return {
+    contentType: 'application/json; charset=utf-8',
+    method: 'post',
+    payload: JSON.stringify(json),
+    muteHttpExceptions: true
+  };
+}
+```
+
+このスクリプトをGoogle Apps Scriptに貼り付け、`SCRIPT_URL`をRender.comのURLに設定します。
+
+## 注意点
+
+ReplitではDiscordBotの常時起動が無料ではできません。常時起動を実現するためには、Render.comや他の有料サービスを利用する必要があります。
 
 ## ライセンス
 
@@ -79,5 +136,8 @@ DISCORD_TOKEN=あなたのディスコードボットトークン
 ## リンク
 - [Discord Developer Portal](https://discord.com/developers/applications)
 - [discord.py Documentation (日本語)](https://discordpy.readthedocs.io/ja/latest/discord.html#)
+- [Render.com](https://render.com/)
+- [UptimeRobot](https://uptimerobot.com/)
+- [Qiita記事](https://qiita.com/Erytheia/items/2f64c06d6d8a4f802390)
 
 このガイドに従って、HaniwaBotをセットアップし、さまざまな便利な機能をDiscordサーバーで活用してください。
