@@ -2,7 +2,7 @@ import discord
 from discord import app_commands
 import aiohttp
 
-from cog.LocationMap import location_map
+from model.LocationMap import location_map
 
 url: str = "https://www.jma.go.jp/bosai/forecast/data/forecast/"
 json: str = '.json'
